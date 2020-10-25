@@ -73,20 +73,22 @@ async function run () {
 	{
 
 		try {
-			await page.waitForSelector('#app > div.page-content > section > div > div > form > div.row-inner > div.row-body > div > div > div.item-container > div.item-qty > input', {timeout: 750})
+			await page.waitForSelector('#app > div.page-content > section > div > div > form > div.row-inner > div.row-body > div > div > div.item-container > div.item-qty > input', {timeout: 1500})
 		}
 		catch(err) {
 			try {
-				await page.waitForSelector('#ITEM\.20-236-479\.1\.0\.0', {timeout: 750})
+				await page.waitForSelector('#ITEM\.20-236-479\.1\.0\.0', {timeout: 1500})
 			}
 			catch(err) {
 				await page.goto('https://secure.newegg.com/Shopping/AddtoCart.aspx?Submit=ADD&ItemList=' + config.item_number, { waitUntil: 'load' })
+				await page.waitForTimeout(1500)
 			}
 		}
 
 		try {
 			await page.waitForSelector('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 1000})
 			await page.click('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 1000})
+			await page.waitForTimeout(1500)
 		} 
 		catch (err) {
 			
@@ -95,15 +97,16 @@ async function run () {
 		try { // at ShoppingItem url
 			await page.waitForSelector('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-operate > div > button.btn.btn-primary', {timeout: 1000})
 			await page.click('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-operate > div > button.btn.btn-primary', {timeout: 1000})
+			await page.waitForTimeout(1500)
 		} 
 		catch (err) {}
 
 		try {
 			await page.waitForSelector('[class="btn btn-primary btn-wide"]', {timeout: 750})
 			await page.click('[class="btn btn-primary btn-wide"]')
-			await page.waitForTimeout(1500)
+			await page.waitForTimeout(2000)
 			try {
-				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 750})
+				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 1000})
 			}
 			catch(err) {break}
 
@@ -113,9 +116,9 @@ async function run () {
 		try { 
 			await page.waitForSelector('#bodyArea > div.article > div.step-navigation > div.actions.l-right > div > a.button.button-primary.has-icon-right', {timeout: 750})
 			await page.click('#bodyArea > div.article > div.step-navigation > div.actions.l-right > div > a.button.button-primary.has-icon-right')
-			await page.waitForTimeout(1500)
+			await page.waitForTimeout(2000)
 			try {
-				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 750})
+				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 1000})
 			}
 			catch(err) {break}
 		} 
@@ -124,9 +127,9 @@ async function run () {
 		try {
 			await page.waitForSelector('[class="button button-primary button-override has-icon-right"]', {timeout: 750})
 			await page.click('[class="button button-primary button-override has-icon-right"]')
-			await page.waitForTimeout(1500)
+			await page.waitForTimeout(2000)
 			try {
-				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 750})
+				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 1000})
 			}
 			catch(err) {break}
 		} 
