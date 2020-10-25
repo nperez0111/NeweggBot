@@ -69,30 +69,46 @@ async function run () {
 	await report("Logged in")
 	await report("Checking for Item")
 
-	while (true)
-	{
+	while (true) {
+
+		if (page.url().includes("areyouahuman")) {
+			await page.waitForTimeout(1000)
+		}
 
 		try {
-			await page.waitForSelector('#app > div.page-content > section > div > div > form > div.row-inner > div.row-body > div > div > div.item-container > div.item-qty > input', {timeout: 1500})
-		}
-		catch(err) {
+			await page.goto('https://secure.newegg.com/Shopping/AddtoCart.aspx?Submit=ADD&ItemList=' + config.item_number, { waitUntil: 'load' })
+			await page.waitForTimeout(1000)
 			try {
-				await page.waitForSelector('#ITEM\.20-236-479\.1\.0\.0', {timeout: 1500})
+				await page.waitForSelector('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-added-info', {timeout: 500})
+				break
+			} catch(err) {
+				try {
+					await page.waitForSelector('#app > div.page-content > section > div > div > form > div.row-inner > div.row-body > div > div > div.item-container > div.item-qty > input', {timeout: 500})
+					break
+				}
+				catch(err) {
+					try {
+						await page.waitForSelector('#bodyArea > div.article > form:nth-child(1) > table.shipping-group.subscription-group > tbody > tr > td:nth-child(3) > div > button:nth-child(2)', {timeout: 500})
+						break
+					}
+					catch(err) {}
+				}
 			}
-			catch(err) {
-				await page.goto('https://secure.newegg.com/Shopping/AddtoCart.aspx?Submit=ADD&ItemList=' + config.item_number, { waitUntil: 'load' })
-				await page.waitForTimeout(1500)
-			}
-		}
 
+		} catch(err) {}
+	}
+
+	await report("Item found")
+	await page.waitForTimeout(1500)
+
+	while (true)
+	{
 		try {
 			await page.waitForSelector('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 1000})
 			await page.click('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 1000})
 			await page.waitForTimeout(1500)
 		} 
-		catch (err) {
-			
-		}
+		catch (err) {}
 
 		try { // at ShoppingItem url
 			await page.waitForSelector('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-operate > div > button.btn.btn-primary', {timeout: 1000})
@@ -134,14 +150,10 @@ async function run () {
 			catch(err) {break}
 		} 
 		catch (err) {}
-		
-		if (page.url().includes("areyouahuman")) {
-			await page.waitForTimeout(1000)
-			await page.goto('https://secure.newegg.com/Shopping/AddtoCart.aspx?Submit=ADD&ItemList=' + config.item_number, { waitUntil: 'load' })
-		}
 	}
 
-	await report("Item found")
+	await report("Continued to cart")
+	await page.waitForTimeout(1500)
 
 	// CONTINUE TO PAYMENT
 	while(true) {
@@ -160,6 +172,7 @@ async function run () {
 	}
 
 	await report("Continued to payment")
+	await page.waitForTimeout(1500)
 
 	// ENTER CVV
 	while (true) {
@@ -187,6 +200,7 @@ async function run () {
 	}
 
 	await report("ccv entered")
+	await page.waitForTimeout(1500)
 
 	// CONTINUE TO ORDER REVIEW
 	while (true) {
@@ -205,6 +219,7 @@ async function run () {
 	}
 
 	await report("Continued to order review")
+	await page.waitForTimeout(1500)
 
 	// PLACE ORDER
 	while (config.auto_submit == "true") {
@@ -222,7 +237,9 @@ async function run () {
 		try {
 			await page.waitForSelector('#btnCreditCard' , {timeout: 500})	
 			await page.click('#btnCreditCard', {timeout: 500})
-			if (await page.$('#btnCreditCard') == null) {
+			try {
+				await page.waitForSelector('#btnCreditCard' , {timeout: 500})	
+			} catch(err) {
 				break
 			}
 		} catch (err) {}
@@ -230,7 +247,9 @@ async function run () {
 		try {
 			await page.waitForSelector('#SubmitOrder' , {timeout: 1500})	
 			await page.click('#SubmitOrder', {timeout: 500})
-			if (await page.$('#SubmitOrder') == null) {
+			try {
+				await page.waitForSelector('#SubmitOrder' , {timeout: 1500})	
+			} catch(err) {
 				break
 			}
 		} catch (err) {}
