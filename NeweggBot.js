@@ -1,4 +1,5 @@
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer');
+const { start } = require('repl');
 const config = require('./config.json')
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,8 +71,17 @@ async function run () {
 	await report("Checking for Item")
 
 	var safecounter = 0
-
+	const startTime = new Date();
+	var nowTime = new Date();
+	var timeDiffMinutes = Math.round((nowTime - startTime) / 1000) / 60;
+	
 	while (true) {
+
+		if (timeDiffMinutes >= 40) {
+			await report("OUT OF TIME")
+					await browser.close()
+					return run();
+		}
 
 		if (page.url().includes("areyouahuman")) {
 			await page.waitForTimeout(1000)
@@ -96,54 +106,37 @@ async function run () {
 					catch(err) {}
 				}
 			}
-
 		} catch(err) {}
 
-		try {
-			await page.waitForSelector('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 250})
-			await page.click('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 250})
-			safecounter = 0
-		} catch(err) {
-			try {
-				await page.waitForSelector('#myaccount > a', {timeout: 500})
-				safecounter = 0
-			} 
-			catch (err) {
-				safecounter++
-				if (safecounter >= 10) {
-					await report("THIS BROWSER CRASHED")
-					await browser.close()
-					return run();
-				}
-			}
-		}
+		nowTime = new Date();
+		timeDiffMinutes = Math.round((nowTime - startTime) / 1000) / 60;
 	}
 
 	await report("Item found")
-	await page.waitForTimeout(1500)
+	await page.waitForTimeout(1000)
 
 	while (true)
 	{
-		try {
-			await page.waitForSelector('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 1000})
-			await page.click('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 1000})
-			await page.waitForTimeout(1500)
+		try { // 'REMOVE ITEM(S)'
+			await page.waitForSelector('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 500})
+			await page.click('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 500})
+			await page.waitForTimeout(500)
 		} 
 		catch (err) {}
 
 		try { // at ShoppingItem url
-			await page.waitForSelector('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-operate > div > button.btn.btn-primary', {timeout: 1000})
-			await page.click('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-operate > div > button.btn.btn-primary', {timeout: 1000})
-			await page.waitForTimeout(1500)
+			await page.waitForSelector('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-operate > div > button.btn.btn-primary', {timeout: 500})
+			await page.click('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-operate > div > button.btn.btn-primary', {timeout: 500})
+			await page.waitForTimeout(500)
 		} 
 		catch (err) {}
 
 		try {
-			await page.waitForSelector('[class="btn btn-primary btn-wide"]', {timeout: 750})
+			await page.waitForSelector('[class="btn btn-primary btn-wide"]', {timeout: 500})
 			await page.click('[class="btn btn-primary btn-wide"]')
-			await page.waitForTimeout(2000)
+			await page.waitForTimeout(1500)
 			try {
-				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 1000})
+				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 500})
 			}
 			catch(err) {break}
 
@@ -151,22 +144,22 @@ async function run () {
 		catch (err) {}
 		
 		try { 
-			await page.waitForSelector('#bodyArea > div.article > div.step-navigation > div.actions.l-right > div > a.button.button-primary.has-icon-right', {timeout: 750})
+			await page.waitForSelector('#bodyArea > div.article > div.step-navigation > div.actions.l-right > div > a.button.button-primary.has-icon-right', {timeout: 500})
 			await page.click('#bodyArea > div.article > div.step-navigation > div.actions.l-right > div > a.button.button-primary.has-icon-right')
-			await page.waitForTimeout(2000)
+			await page.waitForTimeout(1500)
 			try {
-				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 1000})
+				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 500})
 			}
 			catch(err) {break}
 		} 
 		catch (err) {}
 
 		try {
-			await page.waitForSelector('[class="button button-primary button-override has-icon-right"]', {timeout: 750})
+			await page.waitForSelector('[class="button button-primary button-override has-icon-right"]', {timeout: 500})
 			await page.click('[class="button button-primary button-override has-icon-right"]')
 			await page.waitForTimeout(2000)
 			try {
-				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 1000})
+				await page.waitForSelector('#app > header > div.header2020-inner > div.header2020-right > div:nth-child(1) > div:nth-child(2) > a', {timeout: 500})
 			}
 			catch(err) {break}
 		} 
@@ -174,7 +167,7 @@ async function run () {
 	}
 
 	await report("Continued to cart")
-	await page.waitForTimeout(1500)
+	await page.waitForTimeout(1000)
 
 	// CONTINUE TO PAYMENT
 	while(true) {
@@ -193,7 +186,7 @@ async function run () {
 	}
 
 	await report("Continued to payment")
-	await page.waitForTimeout(1500)
+	await page.waitForTimeout(1000)
 
 	// ENTER CVV
 	while (true) {
@@ -221,7 +214,7 @@ async function run () {
 	}
 
 	await report("ccv entered")
-	await page.waitForTimeout(1500)
+	await page.waitForTimeout(1000)
 
 	// CONTINUE TO ORDER REVIEW
 	while (true) {
@@ -240,7 +233,7 @@ async function run () {
 	}
 
 	await report("Continued to order review")
-	await page.waitForTimeout(1500)
+	await page.waitForTimeout(1000)
 
 	// PLACE ORDER
 	while (config.auto_submit == "true") {
