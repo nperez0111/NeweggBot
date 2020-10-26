@@ -69,6 +69,8 @@ async function run () {
 	await report("Logged in")
 	await report("Checking for Item")
 
+	var safecounter = 0
+
 	while (true) {
 
 		if (page.url().includes("areyouahuman")) {
@@ -96,6 +98,25 @@ async function run () {
 			}
 
 		} catch(err) {}
+
+		try {
+			await page.waitForSelector('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 250})
+			await page.click('#app > div.page-content > div > div > div > div.modal-footer > button.btn.btn-secondary', {timeout: 250})
+			safecounter = 0
+		} catch(err) {
+			try {
+				await page.waitForSelector('#myaccount > a', {timeout: 500})
+				safecounter = 0
+			} 
+			catch (err) {
+				safecounter++
+				if (safecounter >= 10) {
+					await report("THIS BROWSER CRASHED")
+					await browser.close()
+					return run();
+				}
+			}
+		}
 	}
 
 	await report("Item found")
@@ -260,4 +281,4 @@ async function run () {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-run()
+run();
