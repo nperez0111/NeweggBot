@@ -1,6 +1,18 @@
 const puppeteer = require('puppeteer');
 const { start } = require('repl');
-const config = require('./config.json')
+const config = require('./config.json');
+const spawn = require("child_process").spawn;
+const getCode = spawn('python', ["C:/MyCode/rtxGUpbot/NeweggBot/quickstart.py"]);
+var verCode = '0';
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+async function get_code() {
+	getCode.stdout.on('data', data => {
+    	report("this shit ran - 1");
+		verCode = data.toString();
+		report(verCode);
+	});
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -23,15 +35,20 @@ async function run () {
 	const page = await browser.newPage()
 	await page.setCacheEnabled(false);
 	
+	var verificationPage = false;
+
     while (true) {
 
+		await page.waitForTimeout(2000)
 		await page.goto('https://secure.newegg.com/NewMyAccount/AccountLogin.aspx?nextpage=https%3a%2f%2fwww.newegg.com%2f' , {waitUntil: 'load' })
 
 		if (page.url().includes('signin')) {
 
 			await page.waitForSelector('button.btn.btn-orange')
 			await page.type('#labeled-input-signEmail', config.email)
-			await page.click('button.btn.btn-orange')
+			await page.waitForTimeout(1500)
+			await page.waitForSelector('#signInSubmit', {timeout: 1500})
+			await page.click('#signInSubmit', {timeout: 500})
 			await page.waitForTimeout(1500)
 
 			try {
@@ -42,6 +59,7 @@ async function run () {
 					await page.waitForSelector('#labeled-input-password' , {timeout: 2500})
 					await page.waitForSelector('button.btn.btn-orange')
 					await page.type('#labeled-input-password', config.password)
+					await page.waitForTimeout(2000)
 					await page.click('button.btn.btn-orange')
 					await page.waitForTimeout(1500)
 
@@ -54,13 +72,26 @@ async function run () {
 				} 
 				catch (err) {
 					report("Manual authorization code required by Newegg.  This should only happen once.")
-					while (page.url().includes('signin')) {
-						await page.waitForTimeout(500)
-					}
-					break
+					verificationPage = true;
 				}
 			}
-		} 
+
+			
+		}
+		
+		if (verificationPage) {
+			await page.waitForTimeout(2000)
+			await get_code();
+			report(verCode)
+			// type first slot
+			// #app > div > div.signin-body > div > div > div.signin-step-3 > form > div > div:nth-child(3) > div > input[type=tel]:nth-child(1)
+			await page.waitForSelector('#app > div > div.signin-body > div > div > div.signin-step-3 > form > div > div:nth-child(3) > div > input[type=tel]:nth-child(1)' , {timeout: 500})
+			await page.type('#app > div > div.signin-body > div > div > div.signin-step-3 > form > div > div:nth-child(3) > div > input[type=tel]:nth-child(1)', verCode)
+			// 'SIGN IN'
+			// #signInSubmit
+			await page.waitForSelector('#signInSubmit' , {timeout: 500})
+			await page.click('#signInSubmit')
+		}
 
 		else if (page.url().includes("areyouahuman")) {
 			await page.waitForTimeout(1000)
@@ -77,39 +108,45 @@ async function run () {
 	
 	while (true) {
 
-		if (timeDiffMinutes >= 40) {
-			await report("OUT OF TIME")
-					await browser.close()
-					return run();
-		}
-
-		if (page.url().includes("areyouahuman")) {
-			await page.waitForTimeout(1000)
-		}
-
 		try {
-			await page.goto('https://secure.newegg.com/Shopping/AddtoCart.aspx?Submit=ADD&ItemList=' + config.item_number, { waitUntil: 'load' })
-			await page.waitForTimeout(1000)
+
+			if (timeDiffMinutes >= 15) {
+				await report("OUT OF TIME")
+						await browser.close()
+						return run();
+			}
+	
+			if (page.url().includes("areyouahuman")) {
+				await page.waitForTimeout(1000)
+			}
+	
 			try {
-				await page.waitForSelector('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-added-info', {timeout: 500})
-				break
-			} catch(err) {
+				await page.goto('https://secure.newegg.com/Shopping/AddtoCart.aspx?Submit=ADD&ItemList=' + config.item_number, { waitUntil: 'load' })
+				await page.waitForTimeout(1000)
 				try {
-					await page.waitForSelector('#app > div.page-content > section > div > div > form > div.row-inner > div.row-body > div > div > div.item-container > div.item-qty > input', {timeout: 500})
+					await page.waitForSelector('#bodyArea > section > div > div > div.message.message-success.message-added > div > div.item-added.fix > div.item-added-info', {timeout: 500})
 					break
-				}
-				catch(err) {
+				} catch(err) {
 					try {
-						await page.waitForSelector('#bodyArea > div.article > form:nth-child(1) > table.shipping-group.subscription-group > tbody > tr > td:nth-child(3) > div > button:nth-child(2)', {timeout: 500})
+						await page.waitForSelector('#app > div.page-content > section > div > div > form > div.row-inner > div.row-body > div > div > div.item-container > div.item-qty > input', {timeout: 500})
 						break
 					}
-					catch(err) {}
+					catch(err) {
+						try {
+							await page.waitForSelector('#bodyArea > div.article > form:nth-child(1) > table.shipping-group.subscription-group > tbody > tr > td:nth-child(3) > div > button:nth-child(2)', {timeout: 500})
+							break
+						}
+						catch(err) {}
+					}
 				}
-			}
-		} catch(err) {}
+			} catch(err) {}
+	
+			nowTime = new Date();
+			timeDiffMinutes = Math.round((nowTime - startTime) / 1000) / 60;
 
-		nowTime = new Date();
-		timeDiffMinutes = Math.round((nowTime - startTime) / 1000) / 60;
+		} catch(err) {
+			await report("Strang new error")
+		}
 	}
 
 	await report("Item found")
