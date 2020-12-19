@@ -1,9 +1,9 @@
 {
-	"email":"email@email.com",
-	"password":"supercoolpassword",
-	"cv2":"123",
-	"refresh_time":"5",
-	"item_number":"N82E16814137595,N82E16814126455",
-	"auto_submit":"true",
-	"price_limit":"800"
+  "email": "email@email.com",
+  "password": "supercoolpassword",
+  "cv2": "123",
+  "refresh_time": "5",
+  "item_number": "N82E16814137595,N82E16814126455",
+  "auto_submit": "true",
+  "price_limit": "800"
 }
