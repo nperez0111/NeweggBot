@@ -1,4 +1,4 @@
-# NeweggBot
+# Newegg Bot
 
 Autonomously buy Products such as RTX 3080 from Newegg as soon as they become available
 
@@ -6,8 +6,12 @@ This bot is very much still in the early stages, and more than a little rough ar
 
 ## Installation
 
-You will require [Node.js 14](https://nodejs.org/en/) to run this.
-After installing via git or by downloading the code and extracting it, navigate to the folder where the files are located via powershell(or equivalent console) and run `npm install puppeteer`.
+1. You will need [Node.js 14](https://nodejs.org/en/) installed to run this.
+2. Download this repository (via git or [this zip file](https://github.com/nperez0111/NeweggBot/archive/master.zip)).
+3. Run the command `npm install` in the directory where this project is on your computer
+4. Copy `config_template.json` to `config.json`
+   - Make changes as discussed below
+5. Run `npm start` to run the script which will open a chrome window
 
 ## Configuration
 
@@ -21,7 +25,7 @@ Once that is finished, create a copy of config_template.json and name it config.
 
 ## Usage
 
-After installation and configuration, the bot can then be run by using `node neweggbot.js`.
+After installation and configuration, the bot can then be run by using `npm start`.
 
 It is important if you've never used your Newegg account before that you setup your account with a valid address and payment information, and then run through the checkout process manually making any changes to shipping and payment as Newegg requests. You don't need to complete that purchase, just correct things so that when you click `Secure Checkout` from the cart, it brings you to `Review`, not `Shipping` or `Payment`.
 
